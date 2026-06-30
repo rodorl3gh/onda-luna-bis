@@ -1,0 +1,94 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           Int      @id @default(autoincrement())
+  username     String   @unique
+  passwordHash String
+  role         String   @default("admin")
+}
+
+model MateriaPrima {
+  id                  Int                      @id @default(autoincrement())
+  code                String                   @unique
+  name                String
+  cost                Float
+  stock               Int                      @default(0)
+  minStock            Int                      @default(5)
+  color               String?
+  createdAt           DateTime                 @default(now())
+  movements           MovimientoMP[]
+  productoMateriasPrimas ProductoMateriaPrima[]
+}
+
+model MovimientoMP {
+  id             Int          @id @default(autoincrement())
+  materiaPrimaId Int
+  materiaPrima   MateriaPrima @relation(fields: [materiaPrimaId], references: [id], onDelete: Cascade)
+  type           String
+  quantity       Int
+  notes          String?
+  createdAt      DateTime     @default(now())
+}
+
+model Producto {
+  id              Int                    @id @default(autoincrement())
+  code            String                 @unique
+  name            String
+  productionCost  Float                  @default(0)
+  salePrice       Float                  @default(0)
+  margin          Float                  @default(0)
+  marginPercent   Float                  @default(0)
+  stock           Int                    @default(0)
+  minStock        Int                    @default(5)
+  color           String?
+  createdAt       DateTime               @default(now())
+  materiasPrimas  ProductoMateriaPrima[]
+  movements       MovimientoProducto[]
+  pedidoItems     PedidoProducto[]
+}
+
+model ProductoMateriaPrima {
+  id             Int          @id @default(autoincrement())
+  productoId     Int
+  producto       Producto     @relation(fields: [productoId], references: [id], onDelete: Cascade)
+  materiaPrimaId Int
+  materiaPrima   MateriaPrima @relation(fields: [materiaPrimaId], references: [id])
+  quantity       Float
+}
+
+model MovimientoProducto {
+  id          Int      @id @default(autoincrement())
+  productoId  Int
+  producto    Producto @relation(fields: [productoId], references: [id], onDelete: Cascade)
+  type        String
+  quantity    Int
+  notes       String?
+  createdAt   DateTime @default(now())
+}
+
+model Pedido {
+  id        Int              @id @default(autoincrement())
+  code      String           @unique
+  status    String           @default("PENDIENTE")
+  notes     String?
+  total     Float            @default(0)
+  createdAt DateTime         @default(now())
+  items     PedidoProducto[]
+}
+
+model PedidoProducto {
+  id         Int      @id @default(autoincrement())
+  pedidoId   Int
+  pedido     Pedido   @relation(fields: [pedidoId], references: [id], onDelete: Cascade)
+  productoId Int
+  producto   Producto @relation(fields: [productoId], references: [id])
+  quantity   Int
+  subtotal   Float    @default(0)
+}

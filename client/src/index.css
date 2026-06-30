@@ -1,0 +1,140 @@
+@import "tailwindcss";
+
+@theme {
+  --font-display: "Outfit", sans-serif;
+  --font-body: "Inter", system-ui, sans-serif;
+
+  --color-primary: #2CB5A8;
+  --color-primary-dark: #24998C;
+  --color-secondary: #D48C9D;
+  --color-secondary-dark: #C9778D;
+  --color-accent: #D5B87E;
+  --color-accent-dark: #C4A76D;
+  --color-text: #896263;
+  --color-text-secondary: #6B6B6B;
+  --color-bg: #FEFEFD;
+  --color-border: #DAD4D1;
+  --color-surface: #FFFFFF;
+  --color-surface-hover: #F8F6F3;
+  --color-success: #2CB5A8;
+  --color-warning: #D5B87E;
+  --color-danger: #C86A6A;
+}
+
+body {
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+:root {
+  --admin-bg: #FEFEFD;
+  --admin-bg-secondary: #FFFFFF;
+  --admin-bg-tertiary: #F5F2EF;
+  --admin-bg-hover: #F0EDE8;
+  --admin-text: #896263;
+  --admin-text-secondary: #6B6B6B;
+  --admin-text-muted: #A39890;
+  --admin-border: #DAD4D1;
+  --admin-border-hover: #C5BFB8;
+  --admin-placeholder: #B5AD9E;
+  --admin-shadow: rgba(137, 98, 99, 0.06);
+  --admin-glow: rgba(44, 181, 168, 0.08);
+  --admin-accent: #2CB5A8;
+  --admin-accent-hover: #24998C;
+  --admin-accent-secondary: #D48C9D;
+  --admin-accent-gold: #D5B87E;
+}
+
+body.admin-mode {
+  background-color: var(--admin-bg);
+  color: var(--admin-text);
+}
+
+body.admin-mode.admin-dark {
+  --admin-bg: #0B0A0A;
+  --admin-bg-secondary: #131112;
+  --admin-bg-tertiary: #1A1718;
+  --admin-bg-hover: #222021;
+  --admin-text: #E8E4DF;
+  --admin-text-secondary: #B5AFA8;
+  --admin-text-muted: #7A7570;
+  --admin-border: #2A2628;
+  --admin-border-hover: #3D383A;
+  --admin-placeholder: #585255;
+  --admin-shadow: rgba(0, 0, 0, 0.5);
+  --admin-glow: rgba(44, 181, 168, 0.05);
+  --admin-accent: #2CB5A8;
+  --admin-accent-hover: #24998C;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+::-webkit-scrollbar {
+  width: 5px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--admin-border);
+  border-radius: 10px;
+}
+
+.onda-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  background: rgba(44, 181, 168, 0.1);
+  border: 1px solid rgba(44, 181, 168, 0.25);
+  color: #2CB5A8;
+  transition: all 0.3s ease;
+}
+.onda-badge:hover {
+  background: rgba(44, 181, 168, 0.18);
+  border-color: rgba(44, 181, 168, 0.4);
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.15rem 0.6rem;
+  border-radius: 9999px;
+  font-size: 0.625rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
+}
+@keyframes slideInRight {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.animate-fade-up { animation: fadeInUp 0.4s ease-out forwards; }
+.animate-scale-in { animation: scaleIn 0.25s ease-out; }
+.animate-slide-right { animation: slideInRight 0.3s ease-out; }
