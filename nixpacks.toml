@@ -13,4 +13,4 @@ cmds = [
 ]
 
 [start]
-cmd = "cd server && npx prisma db push --accept-data-loss && node dist/index.js"
+cmd = "cd server && npx prisma db push --accept-data-loss && npx tsx src/seed.ts && node dist/index.js"
