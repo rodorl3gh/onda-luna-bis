@@ -31,14 +31,12 @@ const clientDist = path.resolve(__dirname, "../../client/dist");
 if (fs.existsSync(clientDist)) {
   console.log("Sirviendo frontend desde " + clientDist);
   app.use(express.static(clientDist));
-  app.get("/{*splat}", (_req, res) => {
+  app.use((req, res) => {
+    if (req.path.startsWith("/api")) return;
     res.sendFile(path.join(clientDist, "index.html"));
   });
 } else {
-  console.log("Frontend no encontrado en " + clientDist + ", usando fallback");
-  app.get("/", (_req, res) => {
-    res.redirect("/api/health");
-  });
+  console.log("Frontend no encontrado en " + clientDist);
 }
 
 app.listen(Number(PORT), HOST, () => {
