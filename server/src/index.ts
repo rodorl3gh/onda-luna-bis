@@ -12,6 +12,7 @@ import dashboardRoutes from "./routes/dashboard.js";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
 const PORT = process.env.PORT || 3001;
+const HOST = "0.0.0.0";
 
 app.use(cors());
 app.use(express.json());
@@ -28,13 +29,19 @@ app.use("/api/dashboard", dashboardRoutes);
 
 const clientDist = path.resolve(__dirname, "../../client/dist");
 if (fs.existsSync(clientDist)) {
+  console.log("Sirviendo frontend desde " + clientDist);
   app.use(express.static(clientDist));
   app.get("*", (_req, res) => {
     res.sendFile(path.join(clientDist, "index.html"));
   });
+} else {
+  console.log("Frontend no encontrado en " + clientDist + ", usando fallback");
+  app.get("/", (_req, res) => {
+    res.redirect("/api/health");
+  });
 }
 
-app.listen(PORT, () => {
+app.listen(Number(PORT), HOST, () => {
   console.log(`\n  Luna — Onda by GLA`);
-  console.log(`  Servidor en http://localhost:${PORT}\n`);
+  console.log(`  Servidor en http://${HOST}:${PORT}\n`);
 });
