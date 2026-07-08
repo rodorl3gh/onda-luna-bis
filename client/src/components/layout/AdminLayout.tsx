@@ -33,8 +33,8 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
 
         <div className="relative w-full max-w-sm p-8 rounded-2xl bg-[var(--admin-bg-secondary)] border border-[var(--admin-border)] shadow-[0_8px_40px_var(--admin-shadow)] animate-scale-in">
           <div className="text-center mb-6">
-            <div className="w-12 h-12 rounded-2xl bg-[var(--admin-accent)] flex items-center justify-center text-white font-bold text-xl mx-auto mb-3 shadow-[0_4px_16px_rgba(148,193,193,0.3)] font-display">
-              L
+            <div className="w-14 h-14 rounded-2xl bg-[var(--admin-bg-tertiary)] border border-[var(--admin-border)] flex items-center justify-center mx-auto mb-3 shadow-[0_4px_16px_rgba(148,193,193,0.3)] overflow-hidden">
+              <img src="/pluma.png" alt="Luna" className="w-10 h-10 object-contain" />
             </div>
             <h1 className="text-lg font-semibold text-[var(--admin-text)] font-display">
               Bisuteria Luna

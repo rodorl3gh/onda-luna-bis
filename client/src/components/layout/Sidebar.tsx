@@ -54,8 +54,8 @@ export default function Sidebar({ mobileOpen, onClose }: SidebarProps) {
 
       <div className="p-5 border-b border-[var(--admin-border)]">
         <NavLink to="/admin" className="flex items-center gap-3 group">
-          <div className="w-9 h-9 rounded-xl bg-[var(--admin-accent)] flex items-center justify-center text-white font-bold text-sm shadow-[0_4px_12px_rgba(148,193,193,0.25)] group-hover:shadow-[0_4px_20px_rgba(148,193,193,0.4)] transition-shadow">
-            L
+          <div className="w-9 h-9 rounded-xl bg-[var(--admin-bg-tertiary)] border border-[var(--admin-border)] flex items-center justify-center shadow-[0_4px_12px_rgba(148,193,193,0.25)] group-hover:shadow-[0_4px_20px_rgba(148,193,193,0.4)] transition-shadow overflow-hidden">
+            <img src="/pluma.png" alt="Luna" className="w-7 h-7 object-contain" />
           </div>
           <div>
             <h1 className="text-sm font-semibold text-[var(--admin-text)] font-display">
