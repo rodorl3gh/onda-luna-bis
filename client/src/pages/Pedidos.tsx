@@ -83,14 +83,6 @@ export default function PedidosPage() {
 
   return (
     <div>
-      <StatsCards
-        costoProduccion={stats?.costoProduccion ?? 0}
-        ventasPeriodo={stats?.ventasPeriodo ?? 0}
-        gananciaNeta={stats?.gananciaNeta ?? 0}
-        totalPedidos={stats?.totalPedidos ?? 0}
-        loading={statsLoading && !stats}
-      />
-
       <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="flex items-center gap-3">
           <MenuButton />
@@ -111,6 +103,14 @@ export default function PedidosPage() {
           Nuevo Pedido
         </button>
       </div>
+
+      <StatsCards
+        costoProduccion={stats?.costoProduccion ?? 0}
+        ventasPeriodo={stats?.ventasPeriodo ?? 0}
+        gananciaNeta={stats?.gananciaNeta ?? 0}
+        totalPedidos={stats?.totalPedidos ?? 0}
+        loading={statsLoading && !stats}
+      />
 
       <PedidoTable
         data={data}
