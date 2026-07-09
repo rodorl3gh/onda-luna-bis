@@ -28,7 +28,6 @@ export interface Producto {
   margin: number;
   marginPercent: number;
   stock: number;
-  minStock: number;
   color: string | null;
   createdAt: string;
   materiasPrimas: ProductoMateriaPrima[];
@@ -46,7 +45,7 @@ export interface ProductoMateriaPrima {
 export interface MovimientoProducto {
   id: number;
   productoId: number;
-  type: "ENTRADA" | "SALIDA" | "AJUSTE";
+  type: "ENTRADA" | "SALIDA" | "AJUSTE" | "PRODUCCION";
   quantity: number;
   notes: string | null;
   createdAt: string;

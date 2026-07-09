@@ -79,33 +79,6 @@ export async function createPedido(data: PedidoData) {
       where: { id: item.productoId },
       data: { stock: newProductStock },
     });
-
-    const productoMps = await prisma.productoMateriaPrima.findMany({
-      where: { productoId: item.productoId },
-    });
-
-    for (const pmp of productoMps) {
-      const mp = await prisma.materiaPrima.findUnique({ where: { id: pmp.materiaPrimaId } });
-      if (!mp) continue;
-
-      const mpQuantity = pmp.quantity * item.quantity;
-      const newMpStock = mp.stock - mpQuantity;
-      if (newMpStock < 0) throw new Error(`Stock insuficiente de materia prima ${mp.name}`);
-
-      await prisma.movimientoMP.create({
-        data: {
-          materiaPrimaId: pmp.materiaPrimaId,
-          type: "SALIDA",
-          quantity: mpQuantity,
-          notes: `Pedido ${pedido.code}`,
-        },
-      });
-
-      await prisma.materiaPrima.update({
-        where: { id: pmp.materiaPrimaId },
-        data: { stock: newMpStock },
-      });
-    }
   }
 
   return prisma.pedido.update({

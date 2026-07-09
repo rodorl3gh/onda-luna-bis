@@ -66,13 +66,13 @@ export default function MateriaPrimaDialog({ open, onClose, onSave, editing }: M
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
-      <div className="bg-[var(--admin-bg-secondary)] border border-[var(--admin-border)] rounded-2xl p-6 w-full max-w-md shadow-2xl animate-scale-in">
+    <div className="fixed inset-0 bg-black/50 z-50 flex items-start justify-center p-2 sm:p-4 pt-[5vh] backdrop-blur-sm overflow-y-auto">
+      <div className="bg-[var(--admin-bg-secondary)] border border-[var(--admin-border)] rounded-2xl p-4 sm:p-6 w-full max-w-md shadow-2xl animate-scale-in my-4">
         <div className="flex items-center justify-between mb-5">
           <h2 className="text-lg font-semibold text-[var(--admin-text)] font-display">
             {editing ? "Editar Materia Prima" : "Nueva Materia Prima"}
           </h2>
-          <button onClick={onClose} className="w-8 h-8 rounded-lg flex items-center justify-center text-[var(--admin-text-muted)] hover:bg-[var(--admin-bg-tertiary)] transition-colors">
+          <button onClick={onClose} className="min-h-[44px] min-w-[44px] w-8 h-8 rounded-lg flex items-center justify-center text-[var(--admin-text-muted)] hover:bg-[var(--admin-bg-tertiary)] transition-colors">
             <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
@@ -93,7 +93,7 @@ export default function MateriaPrimaDialog({ open, onClose, onSave, editing }: M
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Ej: Mostacillas doradas"
-              className="w-full px-4 py-2.5 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-bg)] text-sm text-[var(--admin-text)] placeholder:text-[var(--admin-placeholder)] focus:outline-none focus:border-[var(--admin-accent)]/50 focus:ring-1 focus:ring-[var(--admin-accent)]/20 transition-all"
+              className="w-full px-4 py-3 sm:py-2.5 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-bg)] text-sm text-[var(--admin-text)] placeholder:text-[var(--admin-placeholder)] focus:outline-none focus:border-[var(--admin-accent)]/50 focus:ring-1 focus:ring-[var(--admin-accent)]/20 transition-all min-h-[44px]"
             />
           </div>
           <div className="grid grid-cols-2 gap-3">
@@ -106,7 +106,8 @@ export default function MateriaPrimaDialog({ open, onClose, onSave, editing }: M
                 value={cost}
                 onChange={(e) => setCost(e.target.value)}
                 placeholder="0.00"
-                className="w-full px-4 py-2.5 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-bg)] text-sm text-[var(--admin-text)] placeholder:text-[var(--admin-placeholder)] focus:outline-none focus:border-[var(--admin-accent)]/50 focus:ring-1 focus:ring-[var(--admin-accent)]/20 transition-all"
+                inputMode="decimal"
+                className="w-full px-4 py-3 sm:py-2.5 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-bg)] text-sm text-[var(--admin-text)] placeholder:text-[var(--admin-placeholder)] focus:outline-none focus:border-[var(--admin-accent)]/50 focus:ring-1 focus:ring-[var(--admin-accent)]/20 transition-all min-h-[44px]"
               />
             </div>
             <div>
@@ -118,7 +119,8 @@ export default function MateriaPrimaDialog({ open, onClose, onSave, editing }: M
                 value={minStock}
                 onChange={(e) => setMinStock(e.target.value)}
                 placeholder="5"
-                className="w-full px-4 py-2.5 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-bg)] text-sm text-[var(--admin-text)] placeholder:text-[var(--admin-placeholder)] focus:outline-none focus:border-[var(--admin-accent)]/50 focus:ring-1 focus:ring-[var(--admin-accent)]/20 transition-all"
+                inputMode="numeric"
+                className="w-full px-4 py-3 sm:py-2.5 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-bg)] text-sm text-[var(--admin-text)] placeholder:text-[var(--admin-placeholder)] focus:outline-none focus:border-[var(--admin-accent)]/50 focus:ring-1 focus:ring-[var(--admin-accent)]/20 transition-all min-h-[44px]"
               />
             </div>
           </div>
@@ -164,18 +166,18 @@ export default function MateriaPrimaDialog({ open, onClose, onSave, editing }: M
             <div className="p-3 rounded-xl bg-red-500/5 border border-red-500/20 text-red-500 text-xs">{error}</div>
           )}
 
-          <div className="flex gap-3 pt-2">
+          <div className="flex flex-col sm:flex-row gap-3 pt-2">
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 py-2.5 rounded-xl border border-[var(--admin-border)] text-sm text-[var(--admin-text-secondary)] hover:bg-[var(--admin-bg-tertiary)] transition-colors"
+              className="flex-1 py-3 sm:py-2.5 rounded-xl border border-[var(--admin-border)] text-sm text-[var(--admin-text-secondary)] hover:bg-[var(--admin-bg-tertiary)] transition-colors min-h-[44px]"
             >
               Cancelar
             </button>
             <button
               type="submit"
               disabled={saving}
-              className="flex-1 py-2.5 rounded-xl bg-[#2CB5A8] text-white text-sm font-medium hover:bg-[#249E93] disabled:opacity-40 transition-colors"
+              className="flex-1 py-3 sm:py-2.5 rounded-xl bg-[#2CB5A8] text-white text-sm font-medium hover:bg-[#249E93] disabled:opacity-40 transition-colors min-h-[44px]"
             >
               {saving ? "Guardando..." : editing ? "Guardar Cambios" : "Crear"}
             </button>

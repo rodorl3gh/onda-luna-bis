@@ -8,7 +8,6 @@ interface ProductDialogProps {
   onClose: () => void;
   onSave: (data: {
     name: string;
-    minStock: number;
     salePrice?: number;
     marginPercent?: number;
     color?: string | null;
@@ -25,7 +24,6 @@ interface SelectedMP {
 
 export default function ProductDialog({ open, onClose, onSave, editing, materiasPrimas }: ProductDialogProps) {
   const [name, setName] = useState("");
-  const [minStock, setMinStock] = useState("5");
   const [salePrice, setSalePrice] = useState("");
   const [marginPercent, setMarginPercent] = useState("");
   const [editingField, setEditingField] = useState<"price" | "margin" | null>(null);
@@ -38,7 +36,6 @@ export default function ProductDialog({ open, onClose, onSave, editing, materias
   useEffect(() => {
     if (editing) {
       setName(editing.name);
-      setMinStock(String(editing.minStock));
       setSalePrice(editing.salePrice ? String(editing.salePrice) : "");
       setMarginPercent(editing.marginPercent ? String(editing.marginPercent) : "");
       setColor(editing.color ?? null);
@@ -50,7 +47,6 @@ export default function ProductDialog({ open, onClose, onSave, editing, materias
       );
     } else {
       setName("");
-      setMinStock("5");
       setSalePrice("");
       setMarginPercent("");
       setColor(null);
@@ -148,12 +144,9 @@ export default function ProductDialog({ open, onClose, onSave, editing, materias
     setError("");
 
     if (!name.trim()) { setError("El nombre es obligatorio"); return; }
-    const minNum = Number(minStock);
-    if (isNaN(minNum) || minNum < 0) { setError("El stock minimo debe ser valido"); return; }
 
     const data: any = {
       name: name.trim(),
-      minStock: minNum,
     };
 
     if (color) data.color = color;
@@ -164,7 +157,6 @@ export default function ProductDialog({ open, onClose, onSave, editing, materias
     if (!isNaN(salePriceNum) && salePriceNum > 0) {
       data.salePrice = salePriceNum;
     } else if (!isNaN(marginPctNum) && marginPctNum > 0) {
-      if (marginPctNum >= 100) { setError("El porcentaje de ganancia debe ser menor a 100%"); return; }
       data.marginPercent = marginPctNum;
     } else {
       setError("Ingresa un precio de venta o un porcentaje de ganancia"); return;
@@ -345,16 +337,15 @@ export default function ProductDialog({ open, onClose, onSave, editing, materias
             </div>
             <div>
               <label className="text-[10px] text-[var(--admin-text-muted)] uppercase tracking-wider mb-1.5 block">
-                % Ganancia
+                % Ganancia (sobre costo)
               </label>
               <input
                 type="number"
-                step="0.1"
+                step="1"
                 min="0"
-                max="99.9"
                 value={marginPercent}
                 onChange={(e) => handleMarginChange(e.target.value)}
-                placeholder="0.0"
+                placeholder="0"
                 className="w-full px-4 py-3 sm:py-2.5 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-bg)] text-sm text-[var(--admin-text)] placeholder:text-[var(--admin-placeholder)] focus:outline-none focus:border-[var(--admin-accent)]/50 focus:ring-1 focus:ring-[var(--admin-accent)]/20 transition-all min-h-[44px]"
               />
               {showComputed && editingField === "price" && hasValidPrice && (
@@ -410,21 +401,6 @@ export default function ProductDialog({ open, onClose, onSave, editing, materias
                 />
               </div>
             </div>
-          </div>
-
-          {/* Stock Minimo */}
-          <div>
-            <label className="text-[10px] text-[var(--admin-text-muted)] uppercase tracking-wider mb-1.5 block">
-              Stock Minimo
-            </label>
-            <input
-              type="number"
-              step="1"
-              min="0"
-              value={minStock}
-              onChange={(e) => setMinStock(e.target.value)}
-              className="w-full max-w-[200px] px-4 py-3 sm:py-2.5 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-bg)] text-sm text-[var(--admin-text)] placeholder:text-[var(--admin-placeholder)] focus:outline-none focus:border-[var(--admin-accent)]/50 focus:ring-1 focus:ring-[var(--admin-accent)]/20 transition-all min-h-[44px]"
-            />
           </div>
 
           {error && (

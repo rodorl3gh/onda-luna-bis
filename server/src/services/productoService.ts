@@ -4,7 +4,6 @@ const prisma = new PrismaClient();
 
 export interface ProductoData {
   name: string;
-  minStock: number;
   salePrice?: number;
   marginPercent?: number;
   color?: string | null;
@@ -13,7 +12,7 @@ export interface ProductoData {
 
 export function calcularMargen(productionCost: number, salePrice: number) {
   const margin = salePrice - productionCost;
-  const marginPercent = salePrice > 0 ? (margin / salePrice) * 100 : 0;
+  const marginPercent = productionCost > 0 ? (margin / productionCost) * 100 : 0;
   return {
     margin: Math.round(margin * 100) / 100,
     marginPercent: Math.round(marginPercent * 100) / 100,
@@ -21,8 +20,8 @@ export function calcularMargen(productionCost: number, salePrice: number) {
 }
 
 export function calcularPrecioPorPorcentaje(productionCost: number, marginPercent: number) {
-  if (marginPercent >= 100) throw new Error("El porcentaje de ganancia debe ser menor a 100%");
-  const salePrice = productionCost / (1 - marginPercent / 100);
+  if (marginPercent < 0) throw new Error("El porcentaje de ganancia no puede ser negativo");
+  const salePrice = productionCost * (1 + marginPercent / 100);
   return Math.round(salePrice * 100) / 100;
 }
 
@@ -67,8 +66,6 @@ export async function getProductoById(id: number) {
 }
 
 export async function createProducto(data: ProductoData) {
-  if (data.minStock < 0) throw new Error("El stock mínimo no puede ser negativo");
-
   const code = await generateProductoCode();
   let productionCost = 0;
 
@@ -101,7 +98,6 @@ export async function createProducto(data: ProductoData) {
       salePrice,
       margin,
       marginPercent,
-      minStock: data.minStock,
       stock: 0,
       color: data.color ?? null,
     },
@@ -126,9 +122,6 @@ export async function updateProducto(id: number, data: Partial<ProductoData>) {
     include: { materiasPrimas: { include: { materiaPrima: true } } },
   });
   if (!existing) throw new Error("Producto no encontrado");
-
-  if (data.minStock !== undefined && data.minStock < 0)
-    throw new Error("El stock mínimo no puede ser negativo");
 
   let productionCost = existing.productionCost;
 
@@ -177,7 +170,6 @@ export async function updateProducto(id: number, data: Partial<ProductoData>) {
       salePrice,
       margin,
       marginPercent,
-      ...(data.minStock !== undefined && { minStock: data.minStock }),
       ...(data.color !== undefined && { color: data.color }),
     },
     include: {
@@ -202,8 +194,60 @@ export async function createMovimientoProducto(
   productoId: number,
   data: { type: string; quantity: number; notes?: string }
 ) {
-  const prod = await prisma.producto.findUnique({ where: { id: productoId } });
+  const prod = await prisma.producto.findUnique({
+    where: { id: productoId },
+    include: { materiasPrimas: { include: { materiaPrima: true } } },
+  });
   if (!prod) throw new Error("Producto no encontrado");
+
+  if (data.type === "PRODUCCION") {
+    if (data.quantity <= 0) throw new Error("La cantidad a producir debe ser mayor a 0");
+    if (prod.materiasPrimas.length === 0)
+      throw new Error("Este producto no tiene materias primas asignadas. Edítalo para poder producirlo.");
+
+    for (const pmp of prod.materiasPrimas) {
+      const requerido = pmp.quantity * data.quantity;
+      if (pmp.materiaPrima.stock < requerido) {
+        throw new Error(
+          `Materia prima insuficiente: ${pmp.materiaPrima.name}. Necesitas ${requerido}, disponible ${pmp.materiaPrima.stock}.`
+        );
+      }
+    }
+
+    return prisma.$transaction(async (tx) => {
+      const movement = await tx.movimientoProducto.create({
+        data: {
+          productoId,
+          type: "PRODUCCION",
+          quantity: data.quantity,
+          notes: data.notes || null,
+        },
+      });
+
+      await tx.producto.update({
+        where: { id: productoId },
+        data: { stock: prod.stock + data.quantity },
+      });
+
+      for (const pmp of prod.materiasPrimas) {
+        const usado = pmp.quantity * data.quantity;
+        await tx.movimientoMP.create({
+          data: {
+            materiaPrimaId: pmp.materiaPrimaId,
+            type: "SALIDA",
+            quantity: usado,
+            notes: `Producción ${prod.code} (${data.quantity} pz)`,
+          },
+        });
+        await tx.materiaPrima.update({
+          where: { id: pmp.materiaPrimaId },
+          data: { stock: pmp.materiaPrima.stock - usado },
+        });
+      }
+
+      return movement;
+    });
+  }
 
   let newStock = prod.stock;
   if (data.type === "ENTRADA") {

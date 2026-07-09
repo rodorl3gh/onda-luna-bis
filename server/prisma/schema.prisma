@@ -46,7 +46,6 @@ model Producto {
   margin          Float                  @default(0)
   marginPercent   Float                  @default(0)
   stock           Int                    @default(0)
-  minStock        Int                    @default(5)
   color           String?
   createdAt       DateTime               @default(now())
   materiasPrimas  ProductoMateriaPrima[]

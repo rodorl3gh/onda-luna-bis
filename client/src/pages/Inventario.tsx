@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import ProductTable from "@/components/inventario/ProductTable";
 import ProductDialog from "@/components/inventario/ProductDialog";
 import MovementDialog from "@/components/inventario/MovementDialog";
+import ProduceDialog from "@/components/inventario/ProduceDialog";
 import { api } from "@/services/api";
 import { cn } from "@/lib/utils";
 import type { Producto, MateriaPrima } from "@/types";
@@ -12,6 +13,7 @@ export default function InventarioPage() {
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [movementOpen, setMovementOpen] = useState(false);
+  const [produceOpen, setProduceOpen] = useState(false);
   const [editing, setEditing] = useState<Producto | null>(null);
   const [movementTarget, setMovementTarget] = useState<Producto | null>(null);
   const [viewMode, setViewMode] = useState<"lista" | "cuadricula">("lista");
@@ -55,6 +57,7 @@ export default function InventarioPage() {
     }
   };
   const handleMovement = (p: Producto) => { setMovementTarget(p); setMovementOpen(true); };
+  const handleProduce = (p: Producto) => { setMovementTarget(p); setProduceOpen(true); };
 
   const handleSave = async (formData: any) => {
     if (editing) {
@@ -66,6 +69,12 @@ export default function InventarioPage() {
   };
 
   const handleMovementSave = async (formData: { type: string; quantity: number; notes?: string }) => {
+    if (!movementTarget) return;
+    await api.post(`/productos/${movementTarget.id}/movimientos`, formData);
+    fetchData();
+  };
+
+  const handleProduceSave = async (formData: { type: string; quantity: number; notes?: string }) => {
     if (!movementTarget) return;
     await api.post(`/productos/${movementTarget.id}/movimientos`, formData);
     fetchData();
@@ -151,7 +160,7 @@ export default function InventarioPage() {
                 <div key={m.id} className="flex items-center gap-3 text-xs">
                   <span className={cn(
                     "px-2 py-0.5 rounded-full font-medium",
-                    m.type === "ENTRADA" ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-400" :
+                    m.type === "ENTRADA" || m.type === "PRODUCCION" ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-400" :
                     m.type === "SALIDA" ? "bg-red-100 text-red-700 dark:bg-red-500/15 dark:text-red-400" :
                     "bg-amber-100 text-amber-700 dark:bg-amber-500/15 dark:text-amber-400"
                   )}>{m.type}</span>
@@ -183,6 +192,7 @@ export default function InventarioPage() {
         onEdit={handleEdit}
         onDelete={handleDelete}
         onMovement={handleMovement}
+        onProduce={handleProduce}
       />
 
       {historyOverlayOpen && movementTarget && (
@@ -209,12 +219,12 @@ export default function InventarioPage() {
                     <div key={m.id} className="flex items-center gap-3 text-xs p-2 rounded-lg border border-[var(--admin-border)] bg-[var(--admin-bg-secondary)]">
                       <span className={cn(
                         "px-2 py-0.5 rounded-full font-medium shrink-0",
-                        m.type === "ENTRADA" ? "bg-emerald-100 text-emerald-700" :
+                        m.type === "ENTRADA" || m.type === "PRODUCCION" ? "bg-emerald-100 text-emerald-700" :
                         m.type === "SALIDA" ? "bg-red-100 text-red-700" :
                         "bg-amber-100 text-amber-700"
                       )}>{m.type}</span>
                       <span className="text-[var(--admin-text)] font-mono">
-                        {m.type === "ENTRADA" ? "+" : m.type === "SALIDA" ? "-" : ""}{m.quantity}
+                        {m.type === "ENTRADA" || m.type === "PRODUCCION" ? "+" : m.type === "SALIDA" ? "-" : ""}{m.quantity}
                       </span>
                       <span className="text-[var(--admin-text-muted)]">
                         {new Date(m.createdAt).toLocaleString("es-MX")}
@@ -251,6 +261,13 @@ export default function InventarioPage() {
         onClose={() => setMovementOpen(false)}
         producto={movementTarget}
         onSave={handleMovementSave}
+      />
+
+      <ProduceDialog
+        open={produceOpen}
+        onClose={() => setProduceOpen(false)}
+        producto={movementTarget}
+        onSave={handleProduceSave}
       />
     </div>
   );

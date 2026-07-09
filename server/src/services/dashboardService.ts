@@ -35,11 +35,9 @@ export async function getDashboardStats(from?: string, to?: string) {
   const productos = await prisma.producto.findMany();
   const materiasPrimas = await prisma.materiaPrima.findMany();
 
-  const productosOk = productos.filter((p) => p.stock > p.minStock * 1.5).length;
-  const productosWarning = productos.filter(
-    (p) => p.stock <= p.minStock * 1.5 && p.stock > p.minStock
-  ).length;
-  const productosCritical = productos.filter((p) => p.stock <= p.minStock).length;
+  const productosOk = productos.filter((p) => p.stock > 0).length;
+  const productosWarning = 0;
+  const productosCritical = productos.filter((p) => p.stock <= 0).length;
 
   const mpOk = materiasPrimas.filter((m) => m.stock > m.minStock * 1.5).length;
   const mpWarning = materiasPrimas.filter(
