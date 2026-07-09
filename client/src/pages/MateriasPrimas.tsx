@@ -11,17 +11,32 @@ export default function MateriasPrimasPage() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [movementOpen, setMovementOpen] = useState(false);
   const [editing, setEditing] = useState<MateriaPrima | null>(null);
-  const [movementTarget, setMovementTarget] = useState<MateriaPrima | null>(null);
+  const [movementTarget, setMovementTargetState] = useState<MateriaPrima | null>(null);
   const [historyExpanded, setHistoryExpanded] = useState(false);
+
+  const setMovementTarget = useCallback(
+    (value: React.SetStateAction<MateriaPrima | null>) => {
+      setMovementTargetState((prev) => {
+        const next = typeof value === "function" ? (value as (p: MateriaPrima | null) => MateriaPrima | null)(prev) : value;
+        if (next) localStorage.setItem("mp-selected", String(next.id));
+        else localStorage.removeItem("mp-selected");
+        return next;
+      });
+    },
+    []
+  );
 
   const fetchData = useCallback(async (silent = false) => {
     if (!silent) setLoading(true);
     try {
       const result = await api.get<MateriaPrima[]>("/materias-primas");
       setData(result);
-      setMovementTarget((prev) =>
-        prev ? result.find((mp: MateriaPrima) => mp.id === prev.id) ?? prev : prev
-      );
+      const storedId = Number(localStorage.getItem("mp-selected"));
+      setMovementTargetState((prev) => {
+        const targetId = prev?.id ?? (storedId || null);
+        if (!targetId) return prev;
+        return result.find((mp: MateriaPrima) => mp.id === targetId) ?? prev;
+      });
     } catch (e) {
       console.error(e);
     }
