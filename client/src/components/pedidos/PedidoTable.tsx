@@ -26,30 +26,52 @@ function StatusDropdown({ p, onStatusChange }: { p: Pedido; onStatusChange: Pedi
       if (menuRef.current?.contains(target)) return;
       setOpen(false);
     }
+    function handleReposition() {
+      setOpen(false);
+    }
     if (open) {
       document.addEventListener("mousedown", handleClickOutside);
-      return () => document.removeEventListener("mousedown", handleClickOutside);
+      window.addEventListener("scroll", handleReposition, true);
+      window.addEventListener("resize", handleReposition);
+      return () => {
+        document.removeEventListener("mousedown", handleClickOutside);
+        window.removeEventListener("scroll", handleReposition, true);
+        window.removeEventListener("resize", handleReposition);
+      };
     }
   }, [open]);
 
   const currentStatus = PEDIDO_STATUS[p.status] || { label: p.status, cls: "" };
 
+  const MENU_WIDTH = 160;
+  const MENU_HEIGHT = 190;
+
   const toggleOpen = () => {
-    if (btnRef.current) {
+    if (!open && btnRef.current) {
       const rect = btnRef.current.getBoundingClientRect();
-      setPos({ top: rect.bottom + 4, left: rect.left + rect.width / 2 });
+      const margin = 8;
+      let left = rect.left + rect.width / 2 - MENU_WIDTH / 2;
+      left = Math.max(margin, Math.min(left, window.innerWidth - MENU_WIDTH - margin));
+
+      let top = rect.bottom + 4;
+      if (top + MENU_HEIGHT > window.innerHeight - margin) {
+        top = rect.top - MENU_HEIGHT - 4;
+      }
+      if (top < margin) top = margin;
+
+      setPos({ top, left });
     }
     setOpen(!open);
   };
 
   const handleSelect = async (newStatus: string) => {
     if (newStatus === p.status) { setOpen(false); return; }
+    setOpen(false);
     setLoading(true);
     try {
       await onStatusChange(p.id, newStatus);
     } finally {
       setLoading(false);
-      setOpen(false);
     }
   };
 
@@ -81,15 +103,15 @@ function StatusDropdown({ p, onStatusChange }: { p: Pedido; onStatusChange: Pedi
       {open && createPortal(
         <div
           ref={menuRef}
-          className="fixed z-[9999] w-36 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-bg-secondary)] shadow-[0_8px_40px_rgba(0,0,0,0.15)] p-1 animate-scale-in"
-          style={{ top: pos.top, left: pos.left, transform: "translateX(-50%)" }}
+          className="fixed z-[9999] rounded-xl border border-[var(--admin-border)] bg-[var(--admin-bg-secondary)] shadow-[0_8px_40px_rgba(0,0,0,0.15)] p-1 animate-scale-in"
+          style={{ top: pos.top, left: pos.left, width: MENU_WIDTH }}
         >
           {Object.entries(PEDIDO_STATUS).map(([key, val]) => (
             <button
               key={key}
               onClick={() => handleSelect(key)}
               className={cn(
-                "w-full text-left px-3 py-2 rounded-lg text-xs transition-colors",
+                "w-full text-left px-3 py-2.5 rounded-lg text-xs transition-colors",
                 key === p.status
                   ? "bg-[var(--admin-accent)]/10 text-[var(--admin-accent)] font-medium"
                   : "text-[var(--admin-text-secondary)] hover:bg-[var(--admin-bg-tertiary)] hover:text-[var(--admin-text)]"

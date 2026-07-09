@@ -5,8 +5,6 @@ import {
   createProducto,
   updateProducto,
   deleteProducto,
-  getMovimientosProducto,
-  createMovimientoProducto,
 } from "../services/productoService.js";
 
 const router = Router();
@@ -44,24 +42,6 @@ router.delete("/:id", async (req: Request, res: Response) => {
   try {
     await deleteProducto(Number(req.params.id));
     res.json({ success: true });
-  } catch (e: any) {
-    res.status(400).json({ error: e.message });
-  }
-});
-
-router.get("/:id/movimientos", async (req: Request, res: Response) => {
-  try {
-    const data = await getMovimientosProducto(Number(req.params.id));
-    res.json(data);
-  } catch (e: any) {
-    res.status(500).json({ error: e.message });
-  }
-});
-
-router.post("/:id/movimientos", async (req: Request, res: Response) => {
-  try {
-    const movement = await createMovimientoProducto(Number(req.params.id), req.body);
-    res.status(201).json(movement);
   } catch (e: any) {
     res.status(400).json({ error: e.message });
   }

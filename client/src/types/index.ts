@@ -27,11 +27,9 @@ export interface Producto {
   salePrice: number;
   margin: number;
   marginPercent: number;
-  stock: number;
   color: string | null;
   createdAt: string;
   materiasPrimas: ProductoMateriaPrima[];
-  movements: MovimientoProducto[];
 }
 
 export interface ProductoMateriaPrima {
@@ -40,15 +38,6 @@ export interface ProductoMateriaPrima {
   materiaPrimaId: number;
   quantity: number;
   materiaPrima: MateriaPrima;
-}
-
-export interface MovimientoProducto {
-  id: number;
-  productoId: number;
-  type: "ENTRADA" | "SALIDA" | "AJUSTE" | "PRODUCCION";
-  quantity: number;
-  notes: string | null;
-  createdAt: string;
 }
 
 export interface Pedido {
@@ -76,7 +65,6 @@ export interface DashboardStats {
   gananciaNeta: number;
   totalPedidos: number;
   controlInventario: {
-    productos: { ok: number; warning: number; critical: number };
     materiasPrimas: { ok: number; warning: number; critical: number };
   };
   rango: { from: string; to: string };

@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import AdminLayout from "@/components/layout/AdminLayout";
 import Dashboard from "@/pages/Dashboard";
-import Inventario from "@/pages/Inventario";
+import Productos from "@/pages/Productos";
 import MateriasPrimas from "@/pages/MateriasPrimas";
 import Pedidos from "@/pages/Pedidos";
 
@@ -19,12 +19,16 @@ export default function App() {
           }
         />
         <Route
-          path="/admin/inventario"
+          path="/admin/productos"
           element={
             <AdminLayout>
-              <Inventario />
+              <Productos />
             </AdminLayout>
           }
+        />
+        <Route
+          path="/admin/inventario"
+          element={<Navigate to="/admin/productos" replace />}
         />
         <Route
           path="/admin/materias-primas"

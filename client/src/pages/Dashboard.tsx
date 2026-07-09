@@ -5,6 +5,7 @@ import { api } from "@/services/api";
 import { formatCurrency, formatDate, cn } from "@/lib/utils";
 import type { DashboardStats, Pedido } from "@/types";
 import { PEDIDO_STATUS } from "@/types";
+import { MenuButton } from "@/components/layout/AdminLayout";
 
 function getMexicoToday(): string {
   const d = new Date(new Date().toLocaleString("en-US", { timeZone: "America/Mexico_City" }));
@@ -65,11 +66,14 @@ export default function Dashboard() {
   return (
     <div>
       <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-xl font-semibold text-[var(--admin-text)] font-display">Dashboard</h1>
-          <p className="text-xs text-[var(--admin-text-muted)] mt-0.5">
-            {stats ? `Mostrando del ${new Date(stats.rango.from).toLocaleDateString("es-MX")} al ${new Date(stats.rango.to).toLocaleDateString("es-MX")}` : "Resumen del negocio"}
-          </p>
+        <div className="flex items-center gap-3">
+          <MenuButton />
+          <div>
+            <h1 className="text-xl font-semibold text-[var(--admin-text)] font-display">Dashboard</h1>
+            <p className="text-xs text-[var(--admin-text-muted)] mt-0.5">
+              {stats ? `Mostrando del ${new Date(stats.rango.from).toLocaleDateString("es-MX")} al ${new Date(stats.rango.to).toLocaleDateString("es-MX")}` : "Resumen del negocio"}
+            </p>
+          </div>
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
@@ -122,11 +126,10 @@ export default function Dashboard() {
 
       <div className="mb-4">
         <h2 className="text-sm font-semibold text-[var(--admin-text)] font-display mb-1">Control de Inventario</h2>
-        <p className="text-xs text-[var(--admin-text-muted)]">Estado actual de productos y materias primas</p>
+        <p className="text-xs text-[var(--admin-text-muted)]">Estado actual de materias primas</p>
       </div>
 
       <InventoryControl
-        productos={stats?.controlInventario.productos ?? { ok: 0, warning: 0, critical: 0 }}
         materiasPrimas={stats?.controlInventario.materiasPrimas ?? { ok: 0, warning: 0, critical: 0 }}
         loading={loading}
       />

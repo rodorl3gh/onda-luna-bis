@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import PedidoTable from "@/components/pedidos/PedidoTable";
 import PedidoDialog from "@/components/pedidos/PedidoDialog";
 import StatsCards from "@/components/dashboard/StatsCards";
+import { MenuButton } from "@/components/layout/AdminLayout";
 import { api } from "@/services/api";
 import type { DashboardStats, Pedido, Producto } from "@/types";
 
@@ -91,11 +92,14 @@ export default function PedidosPage() {
       />
 
       <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-xl font-semibold text-[var(--admin-text)] font-display">Pedidos</h1>
-          <p className="text-xs text-[var(--admin-text-muted)] mt-0.5">
-            {data.length} pedidos — Folio automatico: PED-000001
-          </p>
+        <div className="flex items-center gap-3">
+          <MenuButton />
+          <div>
+            <h1 className="text-xl font-semibold text-[var(--admin-text)] font-display">Pedidos</h1>
+            <p className="text-xs text-[var(--admin-text-muted)] mt-0.5">
+              {data.length} pedidos — Folio automatico: PED-000001
+            </p>
+          </div>
         </div>
         <button
           onClick={handleCreate}

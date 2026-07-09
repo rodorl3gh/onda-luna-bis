@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import MateriaPrimaTable from "@/components/materias-primas/MateriaPrimaTable";
 import MateriaPrimaDialog from "@/components/materias-primas/MateriaPrimaDialog";
 import MovementDialog from "@/components/materias-primas/MovementDialog";
+import { MenuButton } from "@/components/layout/AdminLayout";
 import { api } from "@/services/api";
 import type { MateriaPrima } from "@/types";
 
@@ -83,11 +84,14 @@ export default function MateriasPrimasPage() {
   return (
     <div>
       <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-xl font-semibold text-[var(--admin-text)] font-display">Materias Primas</h1>
-          <p className="text-xs text-[var(--admin-text-muted)] mt-0.5">
-            {data.length} registros — Stock gestionado por movimientos
-          </p>
+        <div className="flex items-center gap-3">
+          <MenuButton />
+          <div>
+            <h1 className="text-xl font-semibold text-[var(--admin-text)] font-display">Materias Primas</h1>
+            <p className="text-xs text-[var(--admin-text-muted)] mt-0.5">
+              {data.length} registros — Stock gestionado por movimientos
+            </p>
+          </div>
         </div>
         <button
           onClick={handleCreate}

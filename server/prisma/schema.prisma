@@ -45,11 +45,9 @@ model Producto {
   salePrice       Float                  @default(0)
   margin          Float                  @default(0)
   marginPercent   Float                  @default(0)
-  stock           Int                    @default(0)
   color           String?
   createdAt       DateTime               @default(now())
   materiasPrimas  ProductoMateriaPrima[]
-  movements       MovimientoProducto[]
   pedidoItems     PedidoProducto[]
 }
 
@@ -60,16 +58,6 @@ model ProductoMateriaPrima {
   materiaPrimaId Int
   materiaPrima   MateriaPrima @relation(fields: [materiaPrimaId], references: [id])
   quantity       Float
-}
-
-model MovimientoProducto {
-  id          Int      @id @default(autoincrement())
-  productoId  Int
-  producto    Producto @relation(fields: [productoId], references: [id], onDelete: Cascade)
-  type        String
-  quantity    Int
-  notes       String?
-  createdAt   DateTime @default(now())
 }
 
 model Pedido {

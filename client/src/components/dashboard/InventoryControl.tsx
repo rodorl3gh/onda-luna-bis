@@ -69,21 +69,13 @@ function ControlBlock({ title, ok, warning, critical, loading }: ControlBlockPro
 }
 
 interface InventoryControlProps {
-  productos: { ok: number; warning: number; critical: number };
   materiasPrimas: { ok: number; warning: number; critical: number };
   loading?: boolean;
 }
 
-export default function InventoryControl({ productos, materiasPrimas, loading }: InventoryControlProps) {
+export default function InventoryControl({ materiasPrimas, loading }: InventoryControlProps) {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-      <ControlBlock
-        title="PRODUCTOS"
-        ok={productos.ok}
-        warning={productos.warning}
-        critical={productos.critical}
-        loading={loading}
-      />
+    <div className="grid grid-cols-1 gap-4">
       <ControlBlock
         title="MATERIAS PRIMAS"
         ok={materiasPrimas.ok}

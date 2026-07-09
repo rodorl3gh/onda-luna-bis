@@ -1,9 +1,30 @@
-import { useState, useEffect, type ReactNode } from "react";
+import { useState, useEffect, createContext, useContext, type ReactNode } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { AdminThemeProvider } from "@/hooks/useTheme";
 import Sidebar from "@/components/layout/Sidebar";
 
 const API = "/api";
+
+const SidebarContext = createContext<{ openSidebar: () => void }>({ openSidebar: () => {} });
+
+export function useSidebar() {
+  return useContext(SidebarContext);
+}
+
+export function MenuButton() {
+  const { openSidebar } = useSidebar();
+  return (
+    <button
+      onClick={openSidebar}
+      className="md:hidden shrink-0 w-10 h-10 rounded-xl bg-[var(--admin-bg-secondary)] border border-[var(--admin-border)] flex items-center justify-center text-[var(--admin-text-muted)] hover:text-[var(--admin-text)] transition-colors"
+      aria-label="Abrir menu"
+    >
+      <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+      </svg>
+    </button>
+  );
+}
 
 export default function AdminLayout({ children }: { children: ReactNode }) {
   const [isAdmin, setIsAdmin] = useState(false);
@@ -120,26 +141,20 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
 
   return (
     <AdminThemeProvider>
-      <div className="flex h-screen bg-[var(--admin-bg)]">
-        <Sidebar mobileOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-        {sidebarOpen && (
-          <div
-            className="md:hidden fixed inset-0 bg-black/50 z-40"
-            onClick={() => setSidebarOpen(false)}
-          />
-        )}
-        <div className="flex-1 overflow-y-auto p-4 md:p-6">
-          <button
-            onClick={() => setSidebarOpen(true)}
-            className="md:hidden mb-4 w-10 h-10 rounded-xl bg-[var(--admin-bg-secondary)] border border-[var(--admin-border)] flex items-center justify-center text-[var(--admin-text-muted)] hover:text-[var(--admin-text)] transition-colors"
-          >
-            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
-          </button>
-          {children}
+      <SidebarContext.Provider value={{ openSidebar: () => setSidebarOpen(true) }}>
+        <div className="flex h-screen bg-[var(--admin-bg)]">
+          <Sidebar mobileOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+          {sidebarOpen && (
+            <div
+              className="md:hidden fixed inset-0 bg-black/50 z-40"
+              onClick={() => setSidebarOpen(false)}
+            />
+          )}
+          <div className="flex-1 overflow-y-auto p-4 md:p-6">
+            {children}
+          </div>
         </div>
-      </div>
+      </SidebarContext.Provider>
     </AdminThemeProvider>
   );
 }

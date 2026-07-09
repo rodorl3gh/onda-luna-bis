@@ -32,12 +32,7 @@ export async function getDashboardStats(from?: string, to?: string) {
 
   const gananciaNeta = ventasPeriodo - costoTotal;
 
-  const productos = await prisma.producto.findMany();
   const materiasPrimas = await prisma.materiaPrima.findMany();
-
-  const productosOk = productos.filter((p) => p.stock > 0).length;
-  const productosWarning = 0;
-  const productosCritical = productos.filter((p) => p.stock <= 0).length;
 
   const mpOk = materiasPrimas.filter((m) => m.stock > m.minStock * 1.5).length;
   const mpWarning = materiasPrimas.filter(
@@ -58,7 +53,6 @@ export async function getDashboardStats(from?: string, to?: string) {
     gananciaNeta: Math.round(gananciaNeta * 100) / 100,
     totalPedidos,
     controlInventario: {
-      productos: { ok: productosOk, warning: productosWarning, critical: productosCritical },
       materiasPrimas: { ok: mpOk, warning: mpWarning, critical: mpCritical },
     },
     ultimosPedidos,

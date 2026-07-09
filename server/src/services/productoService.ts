@@ -50,7 +50,6 @@ export async function getAllProductos() {
     orderBy: { createdAt: "desc" },
     include: {
       materiasPrimas: { include: { materiaPrima: true } },
-      movements: { orderBy: { createdAt: "desc" } },
     },
   });
 }
@@ -60,7 +59,6 @@ export async function getProductoById(id: number) {
     where: { id },
     include: {
       materiasPrimas: { include: { materiaPrima: true } },
-      movements: { orderBy: { createdAt: "desc" } },
     },
   });
 }
@@ -98,7 +96,6 @@ export async function createProducto(data: ProductoData) {
       salePrice,
       margin,
       marginPercent,
-      stock: 0,
       color: data.color ?? null,
     },
   });
@@ -174,7 +171,6 @@ export async function updateProducto(id: number, data: Partial<ProductoData>) {
     },
     include: {
       materiasPrimas: { include: { materiaPrima: true } },
-      movements: { orderBy: { createdAt: "desc" } },
     },
   });
 }
@@ -183,96 +179,3 @@ export async function deleteProducto(id: number) {
   return prisma.producto.delete({ where: { id } });
 }
 
-export async function getMovimientosProducto(productoId: number) {
-  return prisma.movimientoProducto.findMany({
-    where: { productoId },
-    orderBy: { createdAt: "desc" },
-  });
-}
-
-export async function createMovimientoProducto(
-  productoId: number,
-  data: { type: string; quantity: number; notes?: string }
-) {
-  const prod = await prisma.producto.findUnique({
-    where: { id: productoId },
-    include: { materiasPrimas: { include: { materiaPrima: true } } },
-  });
-  if (!prod) throw new Error("Producto no encontrado");
-
-  if (data.type === "PRODUCCION") {
-    if (data.quantity <= 0) throw new Error("La cantidad a producir debe ser mayor a 0");
-    if (prod.materiasPrimas.length === 0)
-      throw new Error("Este producto no tiene materias primas asignadas. Edítalo para poder producirlo.");
-
-    for (const pmp of prod.materiasPrimas) {
-      const requerido = pmp.quantity * data.quantity;
-      if (pmp.materiaPrima.stock < requerido) {
-        throw new Error(
-          `Materia prima insuficiente: ${pmp.materiaPrima.name}. Necesitas ${requerido}, disponible ${pmp.materiaPrima.stock}.`
-        );
-      }
-    }
-
-    return prisma.$transaction(async (tx) => {
-      const movement = await tx.movimientoProducto.create({
-        data: {
-          productoId,
-          type: "PRODUCCION",
-          quantity: data.quantity,
-          notes: data.notes || null,
-        },
-      });
-
-      await tx.producto.update({
-        where: { id: productoId },
-        data: { stock: prod.stock + data.quantity },
-      });
-
-      for (const pmp of prod.materiasPrimas) {
-        const usado = pmp.quantity * data.quantity;
-        await tx.movimientoMP.create({
-          data: {
-            materiaPrimaId: pmp.materiaPrimaId,
-            type: "SALIDA",
-            quantity: usado,
-            notes: `Producción ${prod.code} (${data.quantity} pz)`,
-          },
-        });
-        await tx.materiaPrima.update({
-          where: { id: pmp.materiaPrimaId },
-          data: { stock: pmp.materiaPrima.stock - usado },
-        });
-      }
-
-      return movement;
-    });
-  }
-
-  let newStock = prod.stock;
-  if (data.type === "ENTRADA") {
-    newStock += data.quantity;
-  } else if (data.type === "SALIDA") {
-    newStock -= data.quantity;
-  } else if (data.type === "AJUSTE") {
-    newStock = data.quantity;
-  }
-
-  if (newStock < 0) throw new Error("El stock no puede ser negativo");
-
-  const movement = await prisma.movimientoProducto.create({
-    data: {
-      productoId,
-      type: data.type,
-      quantity: data.quantity,
-      notes: data.notes || null,
-    },
-  });
-
-  await prisma.producto.update({
-    where: { id: productoId },
-    data: { stock: newStock },
-  });
-
-  return movement;
-}
