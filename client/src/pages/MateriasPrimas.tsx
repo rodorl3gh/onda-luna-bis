@@ -14,24 +14,23 @@ export default function MateriasPrimasPage() {
   const [movementTarget, setMovementTarget] = useState<MateriaPrima | null>(null);
   const [historyExpanded, setHistoryExpanded] = useState(false);
 
-  const fetchData = useCallback(async () => {
-    setLoading(true);
+  const fetchData = useCallback(async (silent = false) => {
+    if (!silent) setLoading(true);
     try {
       const result = await api.get<MateriaPrima[]>("/materias-primas");
       setData(result);
-      if (movementTarget) {
-        const updated = result.find((mp: MateriaPrima) => mp.id === movementTarget.id);
-        if (updated) setMovementTarget(updated);
-      }
+      setMovementTarget((prev) =>
+        prev ? result.find((mp: MateriaPrima) => mp.id === prev.id) ?? prev : prev
+      );
     } catch (e) {
       console.error(e);
     }
-    setLoading(false);
-  }, [movementTarget]);
+    if (!silent) setLoading(false);
+  }, []);
 
   useEffect(() => { fetchData(); }, [fetchData]);
   useEffect(() => {
-    const i = setInterval(fetchData, 15000);
+    const i = setInterval(() => fetchData(true), 15000);
     return () => clearInterval(i);
   }, [fetchData]);
 
@@ -42,7 +41,7 @@ export default function MateriasPrimasPage() {
     try {
       await api.delete(`/materias-primas/${mp.id}`);
       if (movementTarget?.id === mp.id) setMovementTarget(null);
-      fetchData();
+      fetchData(true);
     } catch (e: any) {
       alert(e.message);
     }
@@ -55,13 +54,13 @@ export default function MateriasPrimasPage() {
     } else {
       await api.post("/materias-primas", formData);
     }
-    fetchData();
+    fetchData(true);
   };
 
   const handleMovementSave = async (formData: { type: string; quantity: number; notes?: string }) => {
     if (!movementTarget) return;
     await api.post(`/materias-primas/${movementTarget.id}/movimientos`, formData);
-    fetchData();
+    fetchData(true);
   };
 
   const selectedMP = movementTarget;
